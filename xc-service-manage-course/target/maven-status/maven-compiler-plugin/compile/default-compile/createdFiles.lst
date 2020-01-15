@@ -1,0 +1,8 @@
+com\xuecheng\manage_course\dao\TeachplanMapper.class
+com\xuecheng\manage_course\controller\CourseController.class
+com\xuecheng\manage_course\dao\TeachplanRepository.class
+com\xuecheng\manage_course\ManageCourseApplication.class
+com\xuecheng\manage_course\dao\CoursePicRepository.class
+com\xuecheng\manage_course\dao\CourseMapper.class
+com\xuecheng\manage_course\dao\CourseBaseRepository.class
+com\xuecheng\manage_course\service\CourseService.class

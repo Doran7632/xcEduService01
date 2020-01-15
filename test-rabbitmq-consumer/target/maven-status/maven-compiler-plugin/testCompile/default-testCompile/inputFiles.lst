@@ -1,0 +1,5 @@
+D:\ideaWorkSpace\xcEduService01\test-rabbitmq-consumer\src\test\java\com\xuecheng\test\rabbitmq\Consumer01.java
+D:\ideaWorkSpace\xcEduService01\test-rabbitmq-consumer\src\test\java\com\xuecheng\test\rabbitmq\Consumer03_routing_email.java
+D:\ideaWorkSpace\xcEduService01\test-rabbitmq-consumer\src\test\java\com\xuecheng\test\rabbitmq\Consumer02_subscribe_email.java
+D:\ideaWorkSpace\xcEduService01\test-rabbitmq-consumer\src\test\java\com\xuecheng\test\rabbitmq\Consumer02_subscribe_sms.java
+D:\ideaWorkSpace\xcEduService01\test-rabbitmq-consumer\src\test\java\com\xuecheng\test\rabbitmq\Consumer03_routing_sms.java

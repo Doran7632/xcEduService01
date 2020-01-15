@@ -1,0 +1,3 @@
+com\xuecheng\test\rabbitmq\config\RabbitmqConfig.class
+com\xuecheng\test\rabbitmq\TestRabbitMqApplication.class
+com\xuecheng\test\rabbitmq\mq\ReceiveHander.class
