@@ -16,12 +16,22 @@ public class CourseController implements CourseControllerApi {
     @Autowired
     CourseService courseService;
 
+    /**
+     * 查询树形结构课程计划
+     * @param courseId
+     * @return
+     */
     @Override
     @GetMapping("/teachplan/list/{courseId}")
     public TeachplanNode findTeachplanList(@PathVariable("courseId") String courseId) {
         return courseService.findTeachplan(courseId);
     }
 
+    /**
+     * 课程计划添加
+     * @param teachplan
+     * @return
+     */
     @PostMapping("/teachplan/add")
     public ResponseResult addTeachplan(Teachplan teachplan) {
         return courseService.addTeachplan(teachplan);

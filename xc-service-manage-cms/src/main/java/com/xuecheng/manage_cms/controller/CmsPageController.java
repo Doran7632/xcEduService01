@@ -19,6 +19,13 @@ public class CmsPageController implements CmsPageControllerApi {
     @Autowired
     PageService pageService;
 
+    /**
+     * 分页查询CMSpage
+     * @param page
+     * @param size
+     * @param queryPageRequest
+     * @return
+     */
     @Override
     @GetMapping("/list/{page}/{size}")
     public QueryResponseResult findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest queryPageRequest) {
@@ -62,6 +69,11 @@ public class CmsPageController implements CmsPageControllerApi {
         return pageService.del(pageId);
     }
 
+    /**
+     * 页面发布
+     * @param pageId
+     * @return
+     */
     @Override
     @PostMapping("/post/{pageId}")
     public ResponseResult post(@PathVariable("pageId") String pageId) {
