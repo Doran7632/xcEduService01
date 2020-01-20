@@ -1,4 +1,4 @@
-xcEduService01
+#xcEduService01
 学习的学成在线后台代码
 初次导入目前开发到了第9天 课程预览Eureka Feign部分
 
@@ -22,4 +22,11 @@ xcEduService01
        获取CmsPage中的pagePhysicalPath字段，该字段表示的是该页面在服务器上的物理路径，
     6）再使用IOUtils的copy方法，将二进制文件替换服务器上的文件，完成页面发布的操作
     
+#课程预览
+1：课程预览操作要求  
     
+    使用ssi技术将课程详情模板（course_main_template）进行拆分 分为 页头，页脚，课程详情页面，教育机构页面等。。。
+    使用nginx作为http服务器用于访问静态资源。
+    若单独访问course_main_template页面，会发现该页面没有任何样式，因为样式都在其他页面，
+    ssi支持的前提是返回的是html页面
+  
