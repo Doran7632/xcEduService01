@@ -1,4 +1,0 @@
-com\xuecheng\manage_cms\controller\CmsConfigController.class
-com\xuecheng\manage_cms\ManageCmsApplication.class
-com\xuecheng\manage_cms\config\RabbitmqConfig.class
-com\xuecheng\manage_cms\dao\CmsConfigRespository.class
