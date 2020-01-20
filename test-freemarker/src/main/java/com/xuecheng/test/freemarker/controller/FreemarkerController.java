@@ -24,6 +24,19 @@ public class FreemarkerController {
         return "index_banner";
     }
 
+    /**
+     * 用于模板测试，将课程详情页面填充
+     * @param map
+     * @return
+     */
+    @RequestMapping("/course")
+    public String testCourse(Map<String, Object> map) {
+        ResponseEntity<Map> forEntity = restTemplate.postForEntity("http://localhost:31200/course/courseview/297e7c7c62b888f00162b8a7dec20000",null,Map.class);
+        Map body = forEntity.getBody();
+        map.putAll(body);
+        return "course";
+    }
+
 
     @RequestMapping("/test1")
     public String test1(Map<String, Object> map) {
