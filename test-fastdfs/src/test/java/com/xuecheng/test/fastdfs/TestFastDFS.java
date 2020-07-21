@@ -53,10 +53,10 @@ public class TestFastDFS {
             //创建stroageClient1.
             StorageClient1 stroageClient1 = new StorageClient1(connection,storeStorage);
             //下载
-            String fileid = "group1/M00/00/00/wKhlg12nDWSAVV4LABEEnEKBTIU052.png";
+            String fileid = "group1/M00/00/00/wKhRgF8WffOAJ2fIAAEuxCKOi1E148.png";
             byte[] bytes = stroageClient1.download_file1(fileid);
             //使用输出流来保存文件
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("e:/log.png"));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("f:/log.png"));
             fileOutputStream.write(bytes);
         }catch (Exception e){
             e.printStackTrace();

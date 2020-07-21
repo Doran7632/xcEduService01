@@ -26,4 +26,4 @@ xuecheng:
     connect_timeout_in_seconds: 5
     network_timeout_in_seconds: 30
     charset: UTF-8
-    tracker_servers: 192.168.101.131:22122
+    tracker_servers: 192.168.81.128:22122
