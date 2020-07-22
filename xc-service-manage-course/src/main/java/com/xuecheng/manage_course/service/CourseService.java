@@ -1,17 +1,24 @@
 package com.xuecheng.manage_course.service;
 
+import com.google.j2objc.annotations.AutoreleasePool;
+import com.xuecheng.framework.domain.cms.CmsPage;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
+import com.xuecheng.framework.domain.course.response.CourseCode;
+import com.xuecheng.framework.domain.course.response.CoursePublishResult;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.Response.CommonCode;
 import com.xuecheng.framework.model.Response.ResponseResult;
+import com.xuecheng.manage_course.client.CmsPageClient;
 import com.xuecheng.manage_course.dao.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -21,6 +28,19 @@ import java.util.Optional;
 
 @Service
 public class CourseService {
+
+    @Value("${course-publish.dataUrlPre}")
+    private String publish_dataUrlPre;
+    @Value("${course-publish.pagePhysicalPath}")
+    private String publish_page_physicalpath;
+    @Value("${course-publish.pageWebPath}")
+    private String publish_page_webpath;
+    @Value("${course-publish.siteId}")
+    private String publish_siteId;
+    @Value("${course-publish.templateId}")
+    private String publish_templateId;
+    @Value("${course-publish.previewUrl}")
+    private String previewUrl;
 
     @Autowired
     TeachplanMapper teachplanMapper;
@@ -37,6 +57,8 @@ public class CourseService {
     @Autowired
     CourseMarketRepository courseMarketRepository;
 
+    @Autowired
+    CmsPageClient cmsPageClient;
 
     public TeachplanNode findTeachplan(String courseId){
         return teachplanMapper.selectList(courseId);
@@ -161,5 +183,52 @@ public class CourseService {
         TeachplanNode teachplan = this.findTeachplan(courseId);
         courseView.setTeachplanNode(teachplan);
         return courseView;
+    }
+
+    /**
+     * 课程预览service
+     * @param id
+     * @return
+     */
+    public CoursePublishResult preview(String id) {
+        //1------------------  请求cms服务，调用euekra服务添加页面
+        CourseBase courseBaseById = this.findCourseBaseById(id);
+        CmsPage cmsPage = new CmsPage();
+        cmsPage.setSiteId(publish_siteId);
+        cmsPage.setDataUrl(publish_dataUrlPre + id);
+        cmsPage.setPageName(id + ".html");
+        cmsPage.setPageAliase(courseBaseById.getName());
+        cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setTemplateId(publish_templateId);
+        //远程调用
+        CmsPageResult cmsPageResult = cmsPageClient.saveCmsPage(cmsPage);
+        if(cmsPage == null){
+            //抛出异常
+            return new CoursePublishResult(CommonCode.FAIL,null);
+        }
+        CmsPage cmsPage1 = cmsPageResult.getCmsPage();
+        String pageId = cmsPage1.getPageId();
+
+        //2------------------  拼装页面预览的url
+        String url = previewUrl + pageId;
+
+        //3------------------  返回CoursePublishResult对象，（包含了页面预览的url）
+        return new CoursePublishResult(CommonCode.SUCCESS,url);
+    }
+
+    /**
+     * 查找课程基本信息
+     * @param courseId
+     * @return
+     */
+    private CourseBase findCourseBaseById(String courseId){
+        Optional<CourseBase> baseOptional = courseBaseRepository.findById(courseId);
+        if(baseOptional.isPresent()){
+            CourseBase courseBase = baseOptional.get();
+            return courseBase;
+        }
+        ExceptionCast.cast(CourseCode.COURSE_NOT_FOUND);
+        return null;
     }
 }

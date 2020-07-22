@@ -346,4 +346,18 @@ public class PageService {
     }
 
 
+    /**
+     * 保存页面，有页面则更新，没有页面则新增
+     * @param cmsPage
+     * @return
+     */
+    public CmsPageResult save(CmsPage cmsPage) {
+        //判断页面是否存在，使用唯一索引来进行判断，在mongodDB中cms_page表中添加pageName ，pageWebPath，siteId这三个字段的唯一索引
+        CmsPage one = cmsPageRespository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if(one!=null){
+            //进行更新
+            return this.update(one.getPageId(),cmsPage);
+        }
+        return this.add(cmsPage);
+    }
 }

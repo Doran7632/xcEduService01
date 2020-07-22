@@ -41,4 +41,8 @@ public interface CmsPageControllerApi {
     //页面发布接口
     @ApiOperation("页面发布")
     public ResponseResult post(String pageId);
+
+    //保存页面（包含新增页面和更新页面，该接口主要是服务课程预览中新增部分）
+    @ApiOperation("新增页面")
+    public CmsPageResult save(CmsPage cmsPage);
 }
