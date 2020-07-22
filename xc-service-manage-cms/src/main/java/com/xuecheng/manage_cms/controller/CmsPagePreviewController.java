@@ -25,6 +25,7 @@ public class CmsPagePreviewController extends BaseController {
     public void getModel(@PathVariable("pageId") String pageId) throws IOException, TemplateException {
         String pageHtml = pageService.getPageHtml(pageId);
         ServletOutputStream outputStream = response.getOutputStream();
+        response.setHeader("Content-type","text/html;charset=utf-8");
         outputStream.write(pageHtml.getBytes("utf-8"));
     }
 }

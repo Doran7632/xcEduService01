@@ -21,6 +21,8 @@
     5）再根据PageId查询，获取HtmlFileId，pagePhysicalPath字段，HtmlFileId字段用于查询GridFS中的二进制文件
        获取CmsPage中的pagePhysicalPath字段，该字段表示的是该页面在服务器上的物理路径，
     6）再使用IOUtils的copy方法，将二进制文件替换服务器上的文件，完成页面发布的操作
+    页面发布的流程最终结果是：将要更改的页面发布到了静态门户中，可以在静态门户项目中查看，所以mongodb中cms_site中的sitePhysicalPath字段应该是门户项目的物理路径
+    如：D:/WebStormSpace/xc-ui-pc-static-portal
     
 #课程预览
 1：课程预览操作要求  

@@ -43,6 +43,17 @@ public class GridTemplateTest {
         System.out.println(store);
     }
 
+    //测试将课程预览详情页面的模板保存到GridFS中
+    @Test
+    public void testGridFs() throws FileNotFoundException {
+        //定义file
+        File file = new File("d:/course.ftl");
+        //定义流
+        FileInputStream inputStream = new FileInputStream(file);
+        ObjectId store = gridFsTemplate.store(inputStream, "course.ftl");
+        System.out.println(store);
+    }
+
 
     //因为为该项目未开发课程模板管理，所以这里使用junit来上传文件到GridFS中
     @Test
