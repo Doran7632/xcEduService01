@@ -31,7 +31,7 @@ public class FreemarkerController {
      */
     @RequestMapping("/course")
     public String testCourse(Map<String, Object> map) {
-        ResponseEntity<Map> forEntity = restTemplate.postForEntity("http://localhost:31200/course/courseview/297e7c7c62b888f00162b8a7dec20000",null,Map.class);
+        ResponseEntity<Map> forEntity = restTemplate.getForEntity("http://localhost:31200/course/courseview/297e7c7c62b888f00162b8a7dec20000",Map.class);
         Map body = forEntity.getBody();
         map.putAll(body);
         return "course";
