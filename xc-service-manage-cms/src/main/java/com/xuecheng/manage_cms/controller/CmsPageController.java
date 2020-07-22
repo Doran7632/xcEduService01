@@ -5,6 +5,7 @@ import com.xuecheng.api.cms.CmsPageControllerApi;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.model.Response.QueryResponseResult;
 import com.xuecheng.framework.model.Response.ResponseResult;
 import com.xuecheng.manage_cms.service.PageService;
@@ -90,5 +91,16 @@ public class CmsPageController implements CmsPageControllerApi {
     public CmsPageResult save(@RequestBody CmsPage cmsPage) {
         CmsPageResult save = pageService.save(cmsPage);
         return save;
+    }
+
+    /**
+     * 一键发布接口
+     * @param cmsPage
+     * @return
+     */
+    @Override
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
+        CmsPostPageResult pageResult = pageService.postPageQuick(cmsPage);
+        return pageResult;
     }
 }

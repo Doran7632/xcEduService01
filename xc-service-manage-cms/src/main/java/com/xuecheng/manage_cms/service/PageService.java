@@ -6,10 +6,12 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.xuecheng.framework.domain.cms.CmsConfig;
 import com.xuecheng.framework.domain.cms.CmsPage;
+import com.xuecheng.framework.domain.cms.CmsSite;
 import com.xuecheng.framework.domain.cms.CmsTemplate;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.Response.CommonCode;
 import com.xuecheng.framework.model.Response.QueryResponseResult;
@@ -18,6 +20,7 @@ import com.xuecheng.framework.model.Response.ResponseResult;
 import com.xuecheng.manage_cms.config.RabbitmqConfig;
 import com.xuecheng.manage_cms.dao.CmsConfigRespository;
 import com.xuecheng.manage_cms.dao.CmsPageRespository;
+import com.xuecheng.manage_cms.dao.CmsSiteRespository;
 import com.xuecheng.manage_cms.dao.CmsTemplateRespository;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -50,6 +53,9 @@ public class PageService {
 
     @Autowired
     CmsPageRespository cmsPageRespository;
+
+    @Autowired
+    CmsSiteRespository cmsSiteRespository;
 
     @Autowired
     CmsConfigRespository cmsConfigRespository;
@@ -359,5 +365,41 @@ public class PageService {
             return this.update(one.getPageId(),cmsPage);
         }
         return this.add(cmsPage);
+    }
+
+    /**
+     * 一键发布接口实现
+     * @param cmsPage
+     * @return
+     */
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
+        //将页面信息存储到cms_page中
+        CmsPageResult save = this.save(cmsPage);
+        if(!save.isSuccess()){
+            //抛出异常
+            ExceptionCast.cast(CommonCode.FAIL);
+        }
+        CmsPage cmsPage1 = save.getCmsPage();
+        String pageId = cmsPage1.getPageId();
+        //执行页面发布(先静态化，保存GridFS,发送mq )
+        ResponseResult post = this.post(pageId);
+        if(!post.isSuccess()){
+            ExceptionCast.cast(CommonCode.FAIL);
+        }
+
+        //拼接url = 站点域名 + 站点webpath + 页面webpath + 页面name
+        String siteId = cmsPage1.getSiteId();
+        CmsSite cmsSite = this.findCmsSiteById(siteId);
+        String pageUrl = cmsSite.getSiteDomain() + cmsSite.getSiteWebPath() + cmsPage1.getPageWebPath() + cmsPage1.getPageName();
+        return new CmsPostPageResult(CommonCode.SUCCESS,pageUrl);
+    }
+
+    //根据站点id查询站点
+    public CmsSite findCmsSiteById(String siteId){
+        Optional<CmsSite> byId = cmsSiteRespository.findById(siteId);
+        if(byId.isPresent()){
+            return byId.get();
+        }
+        return null;
     }
 }
