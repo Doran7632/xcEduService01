@@ -36,4 +36,4 @@ course-publish:
   previewUrl: http://www.xuecheng.com/cms/preview/
   pageWebPath: /course/detail/
   pagePhysicalPath: /course/detail/
-  dataUrlPre: http://localhost:31200/course/courseview/
+  dataUrlPre: http://XC-SERVICE-MANAGE-COURSE:31200/course/courseview/

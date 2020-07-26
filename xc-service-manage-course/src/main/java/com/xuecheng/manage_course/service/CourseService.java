@@ -3,6 +3,7 @@ package com.xuecheng.manage_course.service;
 import com.google.j2objc.annotations.AutoreleasePool;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
@@ -190,6 +191,7 @@ public class CourseService {
      * @param id
      * @return
      */
+    @Transactional
     public CoursePublishResult preview(String id) {
         //1------------------  请求cms服务，调用euekra服务添加页面
         CourseBase courseBaseById = this.findCourseBaseById(id);
@@ -230,5 +232,49 @@ public class CourseService {
         }
         ExceptionCast.cast(CourseCode.COURSE_NOT_FOUND);
         return null;
+    }
+
+    /**
+     * 课程发布
+     * @param id
+     * @return
+     */
+    public CoursePublishResult publish(String id) {
+        //调用cms一键发布接口将课程详情页面发布到服务器
+        CourseBase courseBaseById = this.findCourseBaseById(id);
+        CmsPage cmsPage = new CmsPage();
+        cmsPage.setSiteId(publish_siteId);
+        cmsPage.setDataUrl(publish_dataUrlPre + id);
+        cmsPage.setPageName(id + ".html");
+        cmsPage.setPageAliase(courseBaseById.getName());
+        cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setTemplateId(publish_templateId);
+        CmsPostPageResult pageResult = cmsPageClient.postPageQucik(cmsPage);
+        if (!pageResult.isSuccess()){
+            //抛出异常
+            return new CoursePublishResult(CommonCode.FAIL,null);
+        }
+
+        //保存课程的发布状态为 “已发布”
+        CourseBase courseBase = saveCoursePubState(id);
+        if(courseBase == null) {
+            return new CoursePublishResult(CommonCode.FAIL,null);
+        }
+        //保存课程索引信息
+
+        //缓存课程的信息
+
+        //得到url
+        String pageUrl = pageResult.getPageUrl();
+        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
+    }
+
+    //更改课程状态为 “已发布” 为 202002
+    private CourseBase saveCoursePubState(String courseId){
+        CourseBase courseBaseById = this.findCourseBaseById(courseId);
+        courseBaseById.setStatus("202002");
+        courseBaseRepository.save(courseBaseById);
+        return courseBaseById;
     }
 }
