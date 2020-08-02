@@ -8,6 +8,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -15,6 +16,8 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -503,6 +506,92 @@ public class TestSearch {
             //源文档内容
             Map<String, Object> sourceAsMap = hit.getSourceAsMap();
             String name = (String) sourceAsMap.get("name");
+            //前面由于设置过滤，所以这里查询不出来description
+            String description = (String) sourceAsMap.get("description");
+            String studymodel = (String) sourceAsMap.get("studymodel");
+            Double price = (Double) sourceAsMap.get("price");
+            Date timestamp = simpleDateFormat.parse((String) sourceAsMap.get("timestamp"));
+            System.out.println(name);
+            System.out.println(description);
+            System.out.println(studymodel);
+            System.out.println(price);
+            System.out.println(timestamp);
+        }
+    }
+
+    /**
+     * 高亮显示
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testSearchByHighlight() throws IOException, ParseException {
+        //搜索请求对象
+        SearchRequest searchRequest = new SearchRequest("xc_course");
+        //指定类型
+        searchRequest.types("doc");
+        //搜索源构建对象
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //设置搜索条件
+        //定义MultiMatchQueryBuilder
+        MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery("开发框架", "name", "description")
+                .minimumShouldMatch("80%")
+                .field("name", 10);
+        //定义boolQuery
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(multiMatchQueryBuilder);
+        //定义过滤器
+        boolQueryBuilder.filter(QueryBuilders.rangeQuery("price").gte(0).lte(100));//表示大于60，小于100
+        //搜索方式
+        searchSourceBuilder.query(boolQueryBuilder);
+
+        //添加排序
+        searchSourceBuilder.sort("studymodel", SortOrder.DESC);
+        searchSourceBuilder.sort("price", SortOrder.ASC);
+        //设置源字段过滤，第一个参数表示包含哪些字段，第二个表示不包含
+        searchSourceBuilder.fetchSource(new String[]{"name","studymodel","price","timestamp"},new String[]{});
+
+        //设置高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.preTags("<tag>");
+        highlightBuilder.postTags("</tag>");
+        highlightBuilder.fields().add(new HighlightBuilder.Field("name"));
+        searchSourceBuilder.highlighter(highlightBuilder);
+
+
+        //向搜索请求对象中设置搜索源
+        searchRequest.source(searchSourceBuilder);
+        //执行搜索
+        SearchResponse searchResponse = highLevelClient.search(searchRequest);
+        //搜索结果
+        SearchHits hits = searchResponse.getHits();
+        //匹配到的总记录数
+        long totalHits = hits.getTotalHits();
+        //得到匹配度高的文档
+        SearchHit[] searchHits = hits.getHits();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+
+        for (SearchHit hit : searchHits) {
+            //文档的主键
+            String id = hit.getId();
+            //源文档内容
+            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+            String name = (String) sourceAsMap.get("name");
+
+                //获取高亮字段
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                if(highlightFields != null){
+                    HighlightField nameLightField = highlightFields.get("name");
+                    if(nameLightField != null){
+                        Text[] fragments = nameLightField.getFragments();
+                        StringBuffer stringBuffer = new StringBuffer();
+                        for (Text text : fragments) {
+                            stringBuffer.append(text);
+                        }
+                        name = stringBuffer.toString();
+                    }
+                }
+
             //前面由于设置过滤，所以这里查询不出来description
             String description = (String) sourceAsMap.get("description");
             String studymodel = (String) sourceAsMap.get("studymodel");
